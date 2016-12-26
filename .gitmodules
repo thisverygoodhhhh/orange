@@ -1,0 +1,4 @@
+[submodule "lor"]
+	path = lor
+	url = https://github.com/thisverygoodhhhh/lor.git
+	branch = for-orange
