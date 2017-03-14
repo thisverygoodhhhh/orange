@@ -41,7 +41,7 @@ local function filter_rules(sid, plugin, ngx_var, ngx_var_uri, ngx_var_host)
                 if rule.upstream_url then
                     if not rule.upstream_host or rule.upstream_host=="" then -- host默认取请求的host
                         ngx_var.upstream_host = ngx_var_host
-                    else 
+                    else
                         ngx_var.upstream_host = handle_util.build_upstream_host(extractor_type, rule.upstream_host, variables, plugin)
                     end
 
@@ -68,19 +68,18 @@ end
 local DivideHandler = BasePlugin:extend()
 DivideHandler.PRIORITY = 2000
 
-function DivideHandler:new(store)
-    DivideHandler.super.new(self, "Divide-plugin")
-    self.store = store
+function DivideHandler:post_construct()
+    self:set_name("Divide-plugin")
 end
 
 function DivideHandler:access(conf)
     DivideHandler.super.access(self)
-    
+
     local enable = orange_db.get("divide.enable")
     local meta = orange_db.get_json("divide.meta")
     local selectors = orange_db.get_json("divide.selectors")
     local ordered_selectors = meta and meta.selectors
-    
+
     if not enable or enable ~= true or not meta or not ordered_selectors or not selectors then
         return
     end
@@ -93,7 +92,7 @@ function DivideHandler:access(conf)
         ngx.log(ngx.INFO, "==[Divide][PASS THROUGH SELECTOR:", sid, "]")
         local selector = selectors[sid]
         if selector and selector.enable == true then
-            local selector_pass 
+            local selector_pass
             if selector.type == 0 then -- 全流量选择器
                 selector_pass = true
             else
@@ -123,7 +122,7 @@ function DivideHandler:access(conf)
             end
         end
     end
-    
+
 end
 
 return DivideHandler

@@ -117,11 +117,6 @@ end
 local BasicAuthHandler = BasePlugin:extend()
 BasicAuthHandler.PRIORITY = 2000
 
-function BasicAuthHandler:new(store)
-    BasicAuthHandler.super.new(self, "signature_auth-plugin")
-    self.store = store
-end
-
 function BasicAuthHandler:access(conf)
     BasicAuthHandler.super.access(self)
 

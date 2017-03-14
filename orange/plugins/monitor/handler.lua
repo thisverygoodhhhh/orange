@@ -43,9 +43,8 @@ end
 local URLMonitorHandler = BasePlugin:extend()
 URLMonitorHandler.PRIORITY = 2000
 
-function URLMonitorHandler:new(store)
-    URLMonitorHandler.super.new(self, "monitor-plugin")
-    self.store = store
+function URLMonitorHandler:post_construct(name,store)
+    self:set_name("monitor-plugin")
 end
 
 function URLMonitorHandler:log(conf)
@@ -55,17 +54,17 @@ function URLMonitorHandler:log(conf)
     local meta = orange_db.get_json("monitor.meta")
     local selectors = orange_db.get_json("monitor.selectors")
     local ordered_selectors = meta and meta.selectors
-    
+
     if not enable or enable ~= true or not meta or not ordered_selectors or not selectors then
         return
     end
-    
+
     local ngx_var_uri = ngx.var.uri
     for i, sid in ipairs(ordered_selectors) do
         ngx.log(ngx.INFO, "==[Monitor][PASS THROUGH SELECTOR:", sid, "]")
         local selector = selectors[sid]
         if selector and selector.enable == true then
-            local selector_pass 
+            local selector_pass
             if selector.type == 0 then -- 全流量选择器
                 selector_pass = true
             else
@@ -95,7 +94,7 @@ function URLMonitorHandler:log(conf)
             end
         end
     end
-    
+
 end
 
 

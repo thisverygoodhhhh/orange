@@ -54,7 +54,7 @@ local function filter_rules(sid, plugin, ngx_var_uri)
                     local time_key = current_timetable[limit_type]
                     local limit_key = rule.id .. "#" .. time_key
                     local current_stat = get_current_stat(limit_key) or 0
-                        
+
                     ngx.header["X-RateLimit-Limit" .. "-" .. limit_type] = handle.count
 
                     if current_stat >= handle.count then
@@ -87,19 +87,18 @@ end
 local RateLimitingHandler = BasePlugin:extend()
 RateLimitingHandler.PRIORITY = 1000
 
-function RateLimitingHandler:new(store)
-    RateLimitingHandler.super.new(self, "rate-limiting-plugin")
-    self.store = store
+function RateLimitingHandler:post_construct(name,store)
+    self:name("rate-limiting-plugin")
 end
 
 function RateLimitingHandler:access(conf)
     RateLimitingHandler.super.access(self)
-    
+
     local enable = orange_db.get("rate_limiting.enable")
     local meta = orange_db.get_json("rate_limiting.meta")
     local selectors = orange_db.get_json("rate_limiting.selectors")
     local ordered_selectors = meta and meta.selectors
-    
+
     if not enable or enable ~= true or not meta or not ordered_selectors or not selectors then
         return
     end
@@ -109,7 +108,7 @@ function RateLimitingHandler:access(conf)
         ngx.log(ngx.INFO, "==[RateLimiting][PASS THROUGH SELECTOR:", sid, "]")
         local selector = selectors[sid]
         if selector and selector.enable == true then
-            local selector_pass 
+            local selector_pass
             if selector.type == 0 then -- 全流量选择器
                 selector_pass = true
             else

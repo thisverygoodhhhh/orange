@@ -90,11 +90,6 @@ end
 local PropertyRateLimitingHandler = BasePlugin:extend()
 PropertyRateLimitingHandler.PRIORITY = 1000
 
-function PropertyRateLimitingHandler:new(store)
-    PropertyRateLimitingHandler.super.new(self, plugin_config.name)
-    self.store = store
-end
-
 function PropertyRateLimitingHandler:access(conf)
     PropertyRateLimitingHandler.super.access(self)
 

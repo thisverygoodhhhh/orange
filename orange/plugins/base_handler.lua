@@ -5,7 +5,13 @@
 local Object = require("orange.lib.classic")
 local BasePlugin = Object:extend()
 
-function BasePlugin:new(name)
+function BasePlugin:new(name,store)
+    self._name = name
+    self.store = store
+    self:post_construct()
+end
+
+function BasePlugin:set_name(name)
     self._name = name
 end
 

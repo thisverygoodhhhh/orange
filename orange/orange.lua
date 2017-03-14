@@ -29,7 +29,7 @@ local function load_node_plugins(config, store)
             ngx.log(ngx.DEBUG, "Loading plugin: " .. v)
             table_insert(sorted_plugins, {
                 name = v,
-                handler = plugin_handler(store),
+                handler = plugin_handler(v,store),
             })
         end
     end

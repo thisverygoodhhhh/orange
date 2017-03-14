@@ -53,8 +53,8 @@ end
 local WAFHandler = BasePlugin:extend()
 WAFHandler.PRIORITY = 2000
 
-function WAFHandler:new(store)
-    WAFHandler.super.new(self, "waf-plugin")
+function WAFHandler:post_construct()
+    self:set_name("waf-plugin")
     self.store = store
 end
 
@@ -65,17 +65,17 @@ function WAFHandler:access(conf)
     local meta = orange_db.get_json("waf.meta")
     local selectors = orange_db.get_json("waf.selectors")
     local ordered_selectors = meta and meta.selectors
-    
+
     if not enable or enable ~= true or not meta or not ordered_selectors or not selectors then
         return
     end
-    
+
     local ngx_var_uri = ngx.var.uri
     for i, sid in ipairs(ordered_selectors) do
         ngx.log(ngx.INFO, "==[WAF][PASS THROUGH SELECTOR:", sid, "]")
         local selector = selectors[sid]
         if selector and selector.enable == true then
-            local selector_pass 
+            local selector_pass
             if selector.type == 0 then -- 全流量选择器
                 selector_pass = true
             else
@@ -105,7 +105,7 @@ function WAFHandler:access(conf)
             end
         end
     end
-    
+
 end
 
 return WAFHandler
