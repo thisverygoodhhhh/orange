@@ -1,6 +1,6 @@
 local cjson = require("cjson")
-local orange_data = ngx.shared.orange_data
-
+-- local orange_data = ngx.shared.orange_data
+local orange_data = require("orange.store.cache")
 
 local _M = {}
 
@@ -9,11 +9,14 @@ function _M._get(key)
 end
 
 function _M.get_json(key)
-    local value, f = _M._get(key)
-    if value then
-        value = cjson.decode(value)
-    end
-    return value, f
+
+    return orange_data:get_json(key)
+
+    -- local value, f = _M._get(key)
+    -- if value then
+    --     value = cjson.decode(value)
+    -- end
+    -- return value, f
 end
 
 function _M.get(key)
@@ -25,10 +28,12 @@ function _M._set(key, value)
 end
 
 function _M.set_json(key, value)
-    if value then
-        value = cjson.encode(value)
-    end
-    return _M._set(key, value)
+    return orange_data:set_json(key,value)
+
+    -- if value then
+    --     value = cjson.encode(value)
+    -- end
+    -- return _M._set(key, value)
 end
 
 function _M.set(key, value)
