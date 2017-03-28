@@ -145,7 +145,25 @@ function _M:where( condition, opts )
                 return table.concat(t, ' or ')
 
             elseif operator == 'between' then
+
+                return  condition[2] .. ' between '.. condition[3] .. ' and ' .. condition[4]
+
             elseif operator == 'in' then
+
+                local value_type = type(condition[3])
+
+                if value_type == 'function' then
+
+                    local r = condition[3]()
+                    r = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
+                    return condition[2] .. ' in (' ..  r ..')'
+
+                else
+
+                    return condition[2] .. ' in (' ..  table.concat(condition[3]) ..')'
+
+                end
+
             elseif operator == 'not in' then
             elseif operator == 'like' then
             elseif operator == 'not like' then
