@@ -54,39 +54,36 @@ end
 ---------------------------------------
 function _M:where( condition, opts )
 
-    local condition_type = type(condition)
+    function build_where(condition)
 
-    if condition_type == 'string' then
-        sql.where = condition
-    elseif condition_type == 'function' then
-        local r = condition()
-        sql.where = (type(r) == 'string') and r or error('calculated result by condition() illegal')
-    elseif condition_type ~= 'table' then
-        error('condition illegal')
-    end
+        local condition_type = type(condition)
 
-    if condition[1] then
-        -- array
-        print('--------------')
-        for k, _ in pairs(condition) do
-            if type(k) ~= 'number' then
-                error('condition illegal : find hash')
-            end
+        if condition_type == 'string' then
+            return condition
+        elseif condition_type == 'function' then
+            local r = condition()
+            return (type(r) == 'string') and r or error('calculated result by condition() illegal')
+        elseif condition_type ~= 'table' then
+            error('condition illegal')
         end
 
-
-        function build_where(condition)
+        if condition[1] then
+            -- array
+            for k, _ in pairs(condition) do
+                if type(k) ~= 'number' then
+                    error('condition illegal : find hash')
+                end
+            end
 
             local operator = condition[1]
 
             if operator == 'and' then
-                print('__++++++')
 
                 local t = {'true'}
 
                 for i = 2,#condition do
+
                     local  v = condition[i]
-                    print('=====>>',v)
 
                     local condition_type = type(v)
 
@@ -126,24 +123,23 @@ function _M:where( condition, opts )
             -- elseif operator == 'not exists' then
             end
 
-        end
+        else
+             -- hash
+            local t = {}
+            local i = 1
 
-        sql.where = build_where(condition)
-    else
-        -- hash
-        local t = {}
-        local i = 1
-
-        for k, v in pairs(condition) do
-            if type(k) == 'number' then
-                error('condition illegal : find array')
+            for k, v in pairs(condition) do
+                if type(k) == 'number' then
+                    error('condition illegal : find array')
+                end
+                t[i] = ' `' .. k ..'` = `' .. v..'` '
+                i = i + 1
             end
-            t[i] = ' `' .. k ..'` = `' .. v..'` '
-            i = i + 1
+            return table.concat(t,' and ')
         end
-        sql.where = table.concat(t,' and ')
     end
 
+    sql.where = build_where(condition)
 
     return self
 end
