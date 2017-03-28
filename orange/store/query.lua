@@ -23,7 +23,7 @@ function _M:find( table_name )
     local t = {}
     t.table_name = table_name
     t._attributes = {}
-    t.sql = sql
+    t.sql = {}
 
     setmetatable(t,{
             __index=self,
@@ -33,17 +33,26 @@ end
 
 
 function _M:select( columns, opts )
-    print(columns)
+
+    local value_type = type(columns)
+
+    if value_type == 'string' then
+        self.sql.select = columns
+    elseif value_type  == 'table' then
+        self.sql.select = table.concat(columns,',')
+    end
+
     return self
 end
 
 
 function _M:distinct( yes )
+    self.sql.distinct = yes
     return self
 end
 
 function _M:from( table )
-    print(table)
+    self.sql.table = table
     return self
 
 end
@@ -270,7 +279,7 @@ function _M:where( condition, opts )
         end
     end
 
-    sql.where = build_where(condition)
+    self.sql.where = build_where(condition)
 
     return self
 end
@@ -282,7 +291,6 @@ end
 
 function _M:groupBy( columns )
     return self
-
 end
 
 function _M:having( condition, opts )
@@ -292,21 +300,49 @@ end
 
 
 function _M:union( sql )
-    return self
 
+    local value_type  =  type(sql)
+
+    if value_type == 'string' then
+        self.sql.union = sql
+    elseif value_type =  'function' then
+        local r = sql()
+        self.sql.union = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
+    end
+
+    return self
 end
 
 
 function _M:limit( limit )
+    self.sql.limit = limit
     return self
-
 end
 
 function _M:offset( offset )
+    self.sql.offset = offset
     return self
 end
 
 function _M:orderBy( columns )
+
+    local value_type  =  type(columns)
+
+    if value_type == 'string' then
+
+        self.sql.orderBy = columns
+
+    elseif value_type =  'table' then
+
+        local r = {}
+
+        for k,v in pairs(columns) do
+            r[#r + 1] = k .. (v or '')
+        end
+
+        self.sql.orderBy =  table.concat(r,',')
+    end
+
     return self
 
 end
