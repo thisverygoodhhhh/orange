@@ -111,7 +111,39 @@ function _M:where( condition, opts )
                 return table.concat(t, ' and ')
 
             elseif operator == 'or' then
-                    --todo
+
+                local t = {'false'}
+
+                for i = 2,#condition do
+
+                    local  v = condition[i]
+
+                    local condition_type = type(v)
+
+                    if condition_type  == 'string' then
+
+                        t[#t + 1] = v
+
+                    elseif condition_type  == 'function' then
+
+                        local r = v()
+                        t[#t + 1] = (type(r) == 'string') and r or error('calculated result by condition() illegal')
+
+                    elseif condition_type == 'table' then
+
+                        local r = build_where(v)
+                        print(r)
+                        t[#t + 1] = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
+
+                    else
+
+                        error('or condition illegal')
+
+                    end
+                end
+
+                return table.concat(t, ' or ')
+
             elseif operator == 'between' then
             elseif operator == 'in' then
             elseif operator == 'not in' then
