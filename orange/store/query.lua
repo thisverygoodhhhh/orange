@@ -165,6 +165,22 @@ function _M:where( condition, opts )
                 end
 
             elseif operator == 'not in' then
+
+                local value_type = type(condition[3])
+
+                if value_type == 'function' then
+
+                    local r = condition[3]()
+                    r = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
+                    return condition[2] .. ' not in (' ..  r ..')'
+
+                else
+
+                    return condition[2] .. ' not in (' ..  table.concat(condition[3]) ..')'
+
+                end
+                -- condition[1] = 'in'
+                -- return ' not ' .. build_where(condition)
             elseif operator == 'like' then
             elseif operator == 'not like' then
             elseif operator == 'or like' then
