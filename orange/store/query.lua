@@ -99,7 +99,6 @@ function _M:where( condition, opts )
                     elseif condition_type == 'table' then
 
                         local r = build_where(v)
-                        print(r)
                         t[#t + 1] = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
 
                     else
@@ -132,7 +131,7 @@ function _M:where( condition, opts )
                     elseif condition_type == 'table' then
 
                         local r = build_where(v)
-                        print(r)
+
                         t[#t + 1] = (type(r) == 'string') and r or error('calculated result by build_where(table) illegal')
 
                     else
@@ -182,9 +181,75 @@ function _M:where( condition, opts )
                 -- condition[1] = 'in'
                 -- return ' not ' .. build_where(condition)
             elseif operator == 'like' then
+
+                local value_type = type(condition[3])
+
+                if value_type == 'string' then
+
+                    return condition[2] .. ' like  %' .. condition[3] .. '% '
+
+                elseif value_type == 'table' then
+                    local r = {}
+                    for _,v in ipairs(condition[3]) do
+                        r[#r + 1] = condition[2] .. ' like %' .. v ..'% '
+                    end
+
+                    return table.concat(r,' and ')
+                else
+                    error('like illegal')
+                end
+
             elseif operator == 'not like' then
+                local value_type = type(condition[3])
+
+                if value_type == 'string' then
+
+                    return condition[2] .. ' not like  %' .. condition[3] .. '% '
+
+                elseif value_type == 'table' then
+                    local r = {}
+                    for _,v in ipairs(condition[3]) do
+                        r[#r + 1] = condition[2] .. ' not like %' .. v ..'% '
+                    end
+
+                    return table.concat(r,' and ')
+                else
+                    error('like illegal')
+                end
             elseif operator == 'or like' then
+
+                local value_type = type(condition[3])
+
+                if value_type == 'table' then
+                    local r = {}
+                    for _,v in ipairs(condition[3]) do
+                        r[#r + 1] = condition[2] .. ' like %' .. v ..'% '
+                    end
+
+                    return table.concat(r,' or ')
+                else
+                    error('like illegal')
+                end
+
             elseif operator == 'or not like' then
+
+                local value_type = type(condition[3])
+
+                if value_type == 'string' then
+
+                    return condition[2] .. ' not like  %' .. condition[3] .. '% '
+
+                elseif value_type == 'table' then
+                    local r = {}
+                    for _,v in ipairs(condition[3]) do
+                        r[#r + 1] = condition[2] .. ' not like %' .. v ..'% '
+                    end
+
+                    return table.concat(r,' or ')
+                else
+                    error('like illegal')
+                end
+
             -- elseif operator == 'exists' then
             -- elseif operator == 'not exists' then
             end
