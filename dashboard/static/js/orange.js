@@ -51,8 +51,47 @@
 
                     $("#extractor-area").append($(new_row));
                 } else {//没有任何提取项，从模板创建一个
-                    var html = $("#single-extraction-tmpl").html();
+                    var html = $("#single-header-tmpl").html();
                     $("#extractor-area").append(html);
+                }
+
+                _this.resetAddExtractionBtn();
+            });
+
+        },
+
+        //header 增加、删除按钮事件
+        initHeaderAddOrRemove: function () {
+
+            //添加规则框里的事件
+            //点击“加号“添加新的输入行
+            $(document).on('click', '#header-area .pair .btn-add', _this.addNewExtraction);
+
+            //删除输入行
+            $(document).on('click', '#header-area .pair .btn-remove', function (event) {
+                $(this).parents('.form-group').remove();//删除本行输入
+                _this.resetAddExtractionBtn();
+            });
+        },
+
+        initHeaderAddBtnEvent:function () {
+            $(document).on('click', '#add-header-btn', function () {
+                var row;
+                var current_es = $('.-holder');
+                if (current_es && current_es.length) {
+                    row = current_es[current_es.length - 1];
+                }
+                if (row) {//至少存在了一个提取项
+                    var new_row = $(row).clone(true);
+
+                    var old_type = $(row).find("select[name=rule-extractor-extraction-type]").val();
+                    $(new_row).find("select[name=rule-extractor-extraction-type]").val(old_type);
+                    $(new_row).find("label").text("");
+
+                    $("#header-area").append($(new_row));
+                } else {//没有任何提取项，从模板创建一个
+                    var html = $("#single-header-tmpl").html();
+                    $("#header-area").append(html);
                 }
 
                 _this.resetAddExtractionBtn();
@@ -499,7 +538,9 @@
             $(new_row).insertAfter($(this).parents('.extraction-holder'))
             _this.resetAddExtractionBtn();
         },
+        addNewHeader:function () {
 
+        },
         resetAddExtractionBtn: function () {
             var l = $("#extractor-area .pair").length;
             var c = 0;
