@@ -66,6 +66,8 @@ local function is_authorized(signature_name, secretKey,extractor)
         local str = require "resty.string"
         local calc_sig = str.to_hex(md5:final())
 
+        ngx.log(ngx.INFO,"calclated sig ",calc_sig)
+
         return calc_sig == signature
     end
 
@@ -92,10 +94,11 @@ local function filter_rules(sid, plugin, ngx_var_uri)
                         ngx.log(ngx.INFO, "[SignatureAuth-Pass-Rule] ", rule.name, " uri:", ngx_var_uri)
                     end
                     local credentials = handle.credentials
-                    local authorized = is_authorized(credentials.signame,credentials.secretkey,rule.extractor)
+                    local authorized,msg = is_authorized(credentials.signame,credentials.secretkey,rule.extractor)
                     if authorized then
                         return true
                     else
+                        ngx.log(ngx.INFO,msg)
                         ngx.exit(tonumber(handle.code) or 401)
                         return true
                     end
