@@ -35,7 +35,7 @@
             L.Common.initExtractionHasDefaultValueOrNotEvent();//提取项是否有默认值选择事件
 
             L.Common.initHeaderAddBtnEvent();
-            L.Common.initHeaderAddOrRemove();
+            L.Common.initHeaderAddOrRemove()
 
             L.Common.initViewAndDownloadEvent("dynamic_upstream", _this);
             L.Common.initSwitchBtn("dynamic_upstream", _this);//redirect关闭、开启
@@ -73,6 +73,15 @@
                 result.data = buildExtractorResult.data;
                 return result;
             }
+            //build headers
+            var buildExtractorResult = L.Common.buildHeader();
+            if (buildExtractorResult.success == true) {
+                result.data.headers = buildExtractorResult.data.headers;
+            } else {
+                result.success = false;
+                result.data = buildExtractorResult.data;
+                return result;
+            }
 
             //build handle
             var buildHandleResult = _this.buildHandle();
@@ -91,8 +100,7 @@
             result.success = true;
             return result;
         },
-
-        buildHandle: function(){
+        buildHandle:function(){
             var result = {};
             var handle = {};
             var uri_tmpl = $("#rule-handle-uri-template").val();
