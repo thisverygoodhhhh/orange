@@ -111,6 +111,7 @@ function Orange.init_worker()
     end
 end
 
+
 function Orange.redirect()
     ngx.ctx.ORANGE_REDIRECT_START = now()
 
