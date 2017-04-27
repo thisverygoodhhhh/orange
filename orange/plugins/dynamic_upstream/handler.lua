@@ -7,6 +7,7 @@ local orange_db = require("orange.store.orange_db")
 local judge_util = require("orange.utils.judge")
 local extractor_util = require("orange.utils.extractor")
 local handle_util = require("orange.utils.handle")
+local headers_util = require("orange.utils.headers")
 local BasePlugin = require("orange.plugins.base_handler")
 local ngx_set_uri_args = ngx.req.set_uri_args
 local ngx_decode_args = ngx.decode_args
@@ -30,11 +31,13 @@ local function filter_rules(sid, plugin, ngx_var_uri)
         if rule.enable == true then
             -- judge阶段
             local pass = judge_util.judge_rule(rule, "dynamic_upstream")
-            -- extract阶段
-            local variables = extractor_util.extract_variables(rule.extractor)
-
             -- handle阶段
             if pass then
+                -- extract阶段
+                headers_util:set_headers(rule)
+
+                local variables = extractor_util.extract_variables(rule.extractor)
+
                 local handle = rule.handle
                 if handle and handle.uri_tmpl and handle.upstream_name then
                     local to_rewrite = handle_util.build_uri(rule.extractor.type, handle.uri_tmpl, variables)
