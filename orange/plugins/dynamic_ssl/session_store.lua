@@ -1,7 +1,7 @@
 local ssl_sess = require "ngx.ssl.session"
 local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
 local errlog = ssl_util.log.errlog
-local save_it = ssl_util.share_cache.session_save_timer
+local save_it = ssl_util.session_cache.session_save_timer
 
 
 
