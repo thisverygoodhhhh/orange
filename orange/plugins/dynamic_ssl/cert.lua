@@ -12,8 +12,6 @@ if not name then
     return
 end
 
-infolog("[sni:",name,"]")
-
 -- clear the fallback certificates and private keys
 -- set by the ssl_certificate and ssl_certificate_key directives in nginx conf
 

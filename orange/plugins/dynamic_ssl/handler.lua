@@ -8,11 +8,10 @@ DynamicSSLHandler.PRIORITY = 2000
 function DynamicSSLHandler:new(store)
     DynamicSSLHandler.super.new(self, "dynamic_ssl-plug")
     self.store = store
-    self:sync_cache()
 end
 
 function DynamicSSLHandler:sync_cache()
-    ngx.log(ngx.ERR,"[DynamicSSl] sync cache...")
+
     local enable = orange_db.get("dynamic_ssl.enable")
     local meta = orange_db.get_json("dynamic_ssl.meta")
     local selectors = orange_db.get_json("dynamic_ssl.selectors")
