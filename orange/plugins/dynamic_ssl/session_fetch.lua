@@ -12,13 +12,16 @@ if not sess_id then
 end
 
 local sess, err = cache:get(sess_id)
-if not sess then
+if not sess or ngx.null == sess then
     if  err then
         errlog("failed to look up the session by ID [", sess_id, "] err:", err)
     end
 
     return
 end
+
+
+sess = ngx.decode_base64(sess)
 
 local ok, err = ssl_sess.set_serialized_session(sess)
 if not ok then

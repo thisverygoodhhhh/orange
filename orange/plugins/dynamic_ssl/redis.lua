@@ -7,9 +7,9 @@
 --
 
 local redis = require "resty.redis"
-local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
+local log = require "orange.plugins.dynamic_ssl.logger"
 
-local errlog = ssl_util.log.errlog
+local errlog = log.errlog
 
 
 local RedisFactor = {}
@@ -24,9 +24,7 @@ function RedisFactor:new(host,port,auth)
     local host = host or "127.0.0.1"
     local port = port or 6379
     local auth = auth or nil
-    errlog('connect to redis.....')
     red:set_timeout(timeout)
-
     local ok, err = red:connect(host, port)
 
     if not ok then
@@ -45,7 +43,7 @@ function RedisFactor:new(host,port,auth)
     return red
 end
 
-function RedisFactor:free(red)
+function RedisFactor:release_to_pool(red)
     red:set_keepalive(self.config.max_idle_timeout,self.config.pool_size)
 end
 
