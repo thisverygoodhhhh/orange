@@ -39,8 +39,8 @@ end
 
 
 function session_cache.session_save_timer(premature, sess_id, sess)
-    local sess, err = session_cache:set(sess_id, ngx.encode_base64(sess))
-    if not sess then
+    local res, err = session_cache:set(sess_id, ngx.encode_base64(sess))
+    if not res then
         log.errlog("failed to save the session by ID ",
             sess_id, ": ", err)
         return ngx.exit(ngx.ERROR)
