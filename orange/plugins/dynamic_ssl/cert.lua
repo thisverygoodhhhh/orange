@@ -1,45 +1,12 @@
-local cert_pkey_hash = {}
-local log_plugin_name = " [DynamicSSL] "
+local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
 
-local function errlog(...)
-    ngx.log(ngx.ERR,log_plugin_name,...)
-end
-
-local function infolog(...)
-    ngx.log(ngx.INFO,log_plugin_name,...)
-end
-
-function cert_pkey_hash:get(key)
-    local c = ngx.shared.ssl_cert_pkey
-    local handle = require "orange.plugins.dynamic_ssl.handler"
-
-    local v,err = c:get(key)
-
-    if not v then
-        errlog(key,"not found in cache; err: ",err);
-        handle:sync_cache()
-        v,err = c:get(key)
-    end
-
-    return v,err;
-end
-
-local function my_load_certificate_chain(key)
-    return cert_pkey_hash:get(key..'cert')
-end
-
-local function my_load_private_key(key)
-    return cert_pkey_hash:get(key..'pkey')
-end
+local cert_pkey_hash = ssl_util.cert_pkey_hash
+local errlog = ssl_util.log.errlog
+local infolog = ssl_util.log.infolog
 
 local ssl = require "ngx.ssl"
 
-local addr_data, addr_type, err = ssl.raw_server_addr()
-errlog(addr_data,addr_type,err)
-
-local name,err = ssl.server_name()
-
-
+local name, err = ssl.server_name()
 if not name then
     errlog("could not get sni; err: ",err)
     return
@@ -56,7 +23,7 @@ if not ok then
     return ngx.exit(ngx.ERROR)
 end
 
-local pem_cert_chain,err = (my_load_certificate_chain(name))
+local pem_cert_chain,err = cert_pkey_hash:get_cert(name)
 if not pem_cert_chain then
     errlog("not found the cert. Check dashbaord sni config!",
         "err:", err, '[sni:',name,']')
@@ -77,7 +44,7 @@ if not ok then
     return ngx.exit(ngx.ERROR)
 end
 
-local pem_pkey,err = assert(my_load_private_key(name))
+local pem_pkey,err = cert_pkey_hash:get_pkey(name)
 
 if not pem_pkey then
     errlog("not found the pkey. Check dashbaord sni config!",
@@ -87,7 +54,7 @@ end
 
 local der_pkey,err = ssl.priv_key_pem_to_der(pem_pkey)
 if not der_pkey then
-    ngx.log(ngx.ERR, "failed to convert private key from PEM to DER.",
+    errlog("failed to convert private key from PEM to DER.",
         "Check dashbaord pkey config!",
         "err:", err, "pkey data:",pem_pkey)
     return ngx.exit(ngx.ERROR)
@@ -95,6 +62,6 @@ end
 
 local ok, err = ssl.set_der_priv_key(der_pkey)
 if not ok then
-    ngx.log(ngx.ERR, "failed to set DER private key: ", err)
+    errlog("failed to set DER private key: ", err)
     return ngx.exit(ngx.ERROR)
 end

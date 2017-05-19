@@ -1,7 +1,6 @@
 local orange_db = require("orange.store.orange_db")
 local BasePlugin = require("orange.plugins.base_handler")
-local cache = ngx.shared.ssl_cert_pkey
-
+local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
 
 local DynamicSSLHandler = BasePlugin:extend()
 DynamicSSLHandler.PRIORITY = 2000
@@ -13,11 +12,13 @@ function DynamicSSLHandler:new(store)
 end
 
 function DynamicSSLHandler:sync_cache()
-    ngx.log("[DynamicSSl] sync cache...")
+    ngx.log(ngx.ERR,"[DynamicSSl] sync cache...")
     local enable = orange_db.get("dynamic_ssl.enable")
     local meta = orange_db.get_json("dynamic_ssl.meta")
     local selectors = orange_db.get_json("dynamic_ssl.selectors")
     local ordered_selectors = meta and meta.selectors
+
+    local cert_pkey_hash = ssl_util.cert_pkey_hash
 
     if not enable or enable ~= true or not meta or not ordered_selectors or not selectors then
         return
@@ -33,8 +34,8 @@ function DynamicSSLHandler:sync_cache()
 
             for _, rule in ipairs(rules) do
                 if rule.enable == true then
-                    cache:set(rule.handle.sni .. 'cert',rule.handle.cert)
-                    cache:set(rule.handle.sni .. 'pkey',rule.handle.pkey)
+                    cert_pkey_hash:set_cert(rule.handle.sni,rule.handle.cert)
+                    cert_pkey_hash:set_pkey(rule.handle.sni,rule.handle.pkey)
                 end
             end
         end

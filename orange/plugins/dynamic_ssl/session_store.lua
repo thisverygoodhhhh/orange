@@ -1,15 +1,9 @@
 local ssl_sess = require "ngx.ssl.session"
+local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
+local errlog = ssl_util.log.errlog
+
+
 local cache = ngx.shared.ssl_session
-local log_plugin_name = " [DynamicSSL] "
-
-local function errlog(...)
-    ngx.log(ngx.ERR,log_plugin_name,...)
-end
-
-local function infolog(...)
-    ngx.log(ngx.INFO,log_plugin_name,...)
-end
-
 local function my_save_ssl_session_by_id(sess_id, sess)
     return cache:set(sess_id,sess)
 end
