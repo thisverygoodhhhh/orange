@@ -1,12 +1,9 @@
 local ssl_sess = require "ngx.ssl.session"
 local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
 local errlog = ssl_util.log.errlog
+local save_it = ssl_util.share_cache.session_save_timer
 
 
-local cache = ngx.shared.ssl_session
-local function my_save_ssl_session_by_id(sess_id, sess)
-    return cache:set(sess_id,sess)
-end
 
 local sess_id, err = ssl_sess.get_session_id()
 
@@ -26,14 +23,6 @@ end
 -- dynamically here on the hot code path. Instead, we should
 -- put this function in one of our own Lua module files. this
 -- example is just for demonstration purposes...
-local function save_it(premature, sess_id, sess)
-    local sess, err = my_save_ssl_session_by_id(sess_id, sess)
-    if not sess then
-        errlog("failed to save the session by ID ",
-            sess_id, ": ", err)
-        return ngx.exit(ngx.ERROR)
-    end
-end
 
 local ok, err = ngx.timer.at(0, save_it, sess_id, sess)
 if not ok then
