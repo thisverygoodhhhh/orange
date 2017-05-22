@@ -1,6 +1,5 @@
 local orange_db = require("orange.store.orange_db")
 local BasePlugin = require("orange.plugins.base_handler")
-local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
 
 local DynamicSSLHandler = BasePlugin:extend()
 DynamicSSLHandler.PRIORITY = 2000
@@ -12,6 +11,7 @@ end
 
 function DynamicSSLHandler:sync_cache()
 
+    local ssl_util = require "orange.plugins.dynamic_ssl.ssl_util"
     local enable = orange_db.get("dynamic_ssl.enable")
     local meta = orange_db.get_json("dynamic_ssl.meta")
     local selectors = orange_db.get_json("dynamic_ssl.selectors")

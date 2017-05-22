@@ -7,18 +7,16 @@
 --
 local log = require "orange.plugins.dynamic_ssl.logger"
 local fact = require "orange.plugins.dynamic_ssl.redis"
-
+local ssl_session_timeout = context.config.dynamic_ssl.ssl_session_timeout
 local session_cache = {}
 
 function session_cache:get(key)
 
-
-    local red, err =   fact:new()
+    local red, err = fact:new()
     if not red then
         log.errlog(err)
         return red,err
     end
-
     local res,err = red:get(key)
     red:release_to_pool()
     return res, err
@@ -26,13 +24,13 @@ function session_cache:get(key)
 end
 
 function session_cache:set(k, v)
-    local red, err =   fact:new()
+    local red, err = fact:new()
     if not red then
         log.errlog(err)
         return false, err
     end
     red:set(k,v)
-    red:expire(k,600)
+    red:expire(k,ssl_session_timeout)
     red:release_to_pool()
     return true, err
 end

@@ -15,9 +15,8 @@ function cert_pkey_hash_data:get(key)
     local handle = require "orange.plugins.dynamic_ssl.handler"
 
     local v,err = c:get(key)
-
     if not v then
-        log.errlog(key,"cert or pkey data not found in cache; err: ",err);
+        log.errlog(key," cert or pkey data not found in cache; err: ",err);
         handle:sync_cache()
         v,err = c:get(key)
     end
