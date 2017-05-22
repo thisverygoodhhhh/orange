@@ -103,6 +103,10 @@ return function(config, store)
         res:render("index", data)
     end)
 
+    dashboard_router:get("/dynamic_ssl", function(req, res, next)
+        res:render("dynamic_ssl")
+    end)
+
     dashboard_router:get("/status", function(req, res, next)
         res:render("status")
     end)
