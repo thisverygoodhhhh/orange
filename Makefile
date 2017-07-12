@@ -15,6 +15,10 @@ deps:init-config
 	unzip master.zip
 	yes|cp -fr   lua-resty-http-master/lib/resty/*  resty/
 	rm -fr  master.zip  lua-resty-http-master
+	wget https://github.com/doujiang24/lua-resty-kafka/archive/master.zip
+	unzip master.zip
+	yes|cp -fr lua-resty-kafka-master/lib/resty/* resty
+	rm -fr  master.zip lua-resty-kafka-master
 
 test:
 	@echo "to be continued..."
